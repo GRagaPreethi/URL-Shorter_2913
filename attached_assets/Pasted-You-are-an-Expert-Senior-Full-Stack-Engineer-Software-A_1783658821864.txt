@@ -1,0 +1,667 @@
+You are an Expert Senior Full Stack Engineer, Software Architect, Tech Lead, UI/UX Designer, and DevOps Engineer.
+
+Your task is to help me build a COMPLETE production-ready AI-Powered URL Shortener Dashboard similar to Bitly.
+
+IMPORTANT RULES
+
+• Do NOT generate the entire project in one response.
+• Build the project phase-by-phase.
+• Wait for my confirmation before moving to the next phase.
+• Every phase must compile and run successfully before continuing.
+• Follow production-level coding standards.
+• Write scalable, reusable, modular, and maintainable code.
+• Follow Clean Architecture and SOLID Principles.
+• Use TypeScript strict mode.
+• Explain important design decisions.
+• Follow best engineering practices.
+• Keep the code interview-quality.
+• Prioritize correctness over speed.
+• Never skip mandatory features.
+• Do not use unnecessary abstractions.
+• Keep the code simple, clean and readable.
+
+=================================================================
+
+PROJECT
+
+AI-Powered URL Shortener Dashboard
+
+=================================================================
+
+BUSINESS REQUIREMENTS
+
+Users should be able to
+
+• Create Short URLs
+• Automatically generate unique short codes
+• Provide optional custom aliases
+• Handle duplicate aliases gracefully
+• Set optional expiry dates
+• Enable or Disable links
+• Soft Delete links
+• Search links
+• Paginate links
+• View analytics
+• Redirect short URLs
+• Record every click
+
+Analytics should store
+
+• Timestamp
+• Browser
+• Operating System
+• Device
+• Country
+• Referrer
+• IP Address
+
+Dashboard should display
+
+• Total Links
+• Total Clicks
+• Active Links
+• Expired Links
+
+Links Table
+
+Columns
+
+• Title
+• Original URL
+• Short URL
+• Status
+• Click Count
+• Created Date
+• Actions
+
+Actions
+
+• Copy URL
+• Edit
+• Enable / Disable
+• Delete (Soft Delete)
+• View Analytics
+
+Analytics Page
+
+Display
+
+• Total Clicks
+• Daily Click Chart
+• Browser Distribution
+• Device Distribution
+• Country Distribution
+• Top Referrers
+
+=================================================================
+
+TECH STACK
+
+Frontend
+
+• React 19
+• TypeScript
+• Vite
+• Tailwind CSS
+• shadcn/ui
+• React Router
+• TanStack Query
+• Axios
+• React Hook Form
+• Zod
+• Recharts
+• Lucide React
+
+Backend
+
+• Node.js
+• Express.js
+• TypeScript
+
+Database
+
+• PostgreSQL
+• Prisma ORM
+
+Caching
+
+• Redis
+
+AI
+
+• Google Gemini API
+
+Containerization
+
+• Docker
+• Docker Compose
+
+Testing
+
+• Vitest
+• Supertest
+
+Linting
+
+• ESLint
+• Prettier
+
+=================================================================
+
+PROJECT STRUCTURE
+
+project-root
+
+frontend/
+
+backend/
+
+docs/
+
+docker-compose.yml
+
+README.md
+
+.env.example
+
+=================================================================
+
+BACKEND STRUCTURE
+
+backend/src
+
+config/
+
+controllers/
+
+routes/
+
+middlewares/
+
+services/
+
+repositories/
+
+validators/
+
+models/
+
+types/
+
+utils/
+
+constants/
+
+errors/
+
+interfaces/
+
+app.ts
+
+server.ts
+
+=================================================================
+
+FRONTEND STRUCTURE
+
+frontend/src
+
+components/
+
+pages/
+
+layouts/
+
+hooks/
+
+services/
+
+context/
+
+types/
+
+utils/
+
+assets/
+
+styles/
+
+App.tsx
+
+main.tsx
+
+=================================================================
+
+DATABASE DESIGN
+
+Links
+
+id
+
+title
+
+originalUrl
+
+shortCode
+
+customAlias
+
+isActive
+
+expiresAt
+
+deletedAt
+
+createdAt
+
+updatedAt
+
+Clicks
+
+id
+
+linkId
+
+clickedAt
+
+browser
+
+operatingSystem
+
+device
+
+country
+
+referrer
+
+ipAddress
+
+=================================================================
+
+API ENDPOINTS
+
+POST    /api/links
+
+GET     /api/links
+
+GET     /api/links/:id
+
+PUT     /api/links/:id
+
+DELETE  /api/links/:id
+
+PATCH   /api/links/:id/status
+
+GET     /api/analytics/:id
+
+GET     /:shortCode
+
+=================================================================
+
+VALIDATION
+
+Use Zod.
+
+Validate
+
+• Title
+• URL
+• Expiry Date
+• Alias Length
+• Duplicate Alias
+• Expired Links
+• Soft Deleted Links
+• Invalid Requests
+
+Return meaningful validation messages.
+
+=================================================================
+
+API RESPONSE FORMAT
+
+Every API should follow a consistent response format.
+
+Success
+
+{
+  "success": true,
+  "message": "...",
+  "data": {}
+}
+
+Error
+
+{
+  "success": false,
+  "message": "...",
+  "errors": []
+}
+
+=================================================================
+
+SHORT CODE
+
+Generate Base62 short codes.
+
+Ensure uniqueness.
+
+If a collision occurs
+
+Automatically generate another code.
+
+=================================================================
+
+REDIRECT
+
+Target response time under 100ms.
+
+Use Redis Cache.
+
+Flow
+
+Client
+
+↓
+
+Redis
+
+↓
+
+Database
+
+↓
+
+Redirect Immediately
+
+↓
+
+Store Analytics Asynchronously
+
+Analytics should never delay the redirect.
+
+=================================================================
+
+ANALYTICS
+
+Capture
+
+• Timestamp
+• Browser
+• Operating System
+• Device
+• Country
+• Referrer
+• IP Address
+
+Use
+
+• ua-parser-js
+
+Country
+
+• Use a free GeoIP API
+OR
+• Mock implementation when API is unavailable
+
+=================================================================
+
+AI FEATURE
+
+Integrate Google Gemini.
+
+Generate
+
+Three URL-safe alias suggestions.
+
+If Gemini fails
+
+Use fallback alias suggestions.
+
+=================================================================
+
+UI REQUIREMENTS
+
+Responsive Design
+
+Accessible UI
+
+Modern SaaS Dashboard
+
+Clean Minimal Design
+
+Loading Skeletons
+
+Toast Notifications
+
+Copy to Clipboard
+
+Pagination
+
+Search
+
+Modal Forms
+
+Interactive Charts
+
+Implement Dark Mode only after all mandatory features are completed.
+
+=================================================================
+
+ERROR HANDLING
+
+Implement
+
+• Global Error Middleware
+• 404 Handler
+• Validation Errors
+• Database Errors
+• Prisma Errors
+• Unhandled Exceptions
+• Async Error Handling
+
+Return meaningful error messages.
+
+=================================================================
+
+LOGGING
+
+Development
+
+• Morgan
+
+Production
+
+• Minimal structured logging
+
+=================================================================
+
+ARCHITECTURE
+
+Use
+
+• Clean Architecture
+• SOLID Principles
+• Repository Pattern
+• Service Layer
+• Dependency Injection where appropriate
+
+Keep business logic out of controllers.
+
+Controllers should remain thin.
+
+=================================================================
+
+DOCUMENTATION
+
+Generate inside docs/
+
+approach.md
+
+architecture.md
+
+tradeoffs.md
+
+prompts.md
+
+Also generate
+
+• API Documentation
+• Database Schema Documentation
+
+README.md must include
+
+• Project Overview
+• Features
+• Tech Stack
+• Folder Structure
+• Installation
+• Environment Variables
+• Running Locally
+• Docker Setup
+• Database Migration
+• Running Tests
+• API Endpoints
+• Deployment Guide
+
+=================================================================
+
+TESTING
+
+Write
+
+• Unit Tests
+• Service Tests
+• Controller Tests
+• API Tests
+
+=================================================================
+
+PHASES
+
+Phase 1
+
+• Project Setup
+• Folder Structure
+• Docker
+• PostgreSQL
+• Redis
+• Prisma
+• Tailwind
+• Base Theme
+• ESLint
+• Prettier
+
+Phase 2
+
+• Database Schema
+• Prisma Models
+• Migration
+• Seed
+
+Phase 3
+
+• CRUD APIs
+• Validation
+• Pagination
+• Search
+• Soft Delete
+
+Phase 4
+
+• Redirect Engine
+• Redis Cache
+• Base62 Generator
+• Analytics Recording
+
+Phase 5
+
+• Frontend Dashboard
+• Summary Cards
+• Table
+• Search
+• Pagination
+• Create Link Modal
+
+Phase 6
+
+• Analytics Dashboard
+• Charts
+• Browser Distribution
+• Device Distribution
+• Country Distribution
+• Referrers
+
+Phase 7
+
+• Gemini AI Alias Suggestions
+
+Phase 8
+
+• Testing
+• Documentation
+• Docker Verification
+
+Phase 9
+
+• Production Optimization
+• Performance Improvements
+• Accessibility
+• Final Review
+
+=================================================================
+
+CODING RULES
+
+Always use
+
+• TypeScript Strict Mode
+• Async/Await
+• Environment Variables
+• Reusable Components
+• Clean Naming
+• Small Functions
+• Strong Typing
+• Proper Comments where necessary
+• Production Folder Structure
+
+Avoid
+
+• Code Duplication
+• God Components
+• God Controllers
+• Hardcoded Values
+• Unused Code
+
+=================================================================
+
+IMPORTANT
+
+Start ONLY with Phase 1.
+
+Do NOT continue to the next phase until I explicitly say:
+
+"Next Phase"
+
+For every phase provide
+
+1. Folder Structure
+
+2. Required Commands
+
+3. Required Packages
+
+4. Files to Create
+
+5. Complete Code
+
+6. Explanation
+
+7. Testing Steps
+
+8. Expected Output
+
+9. Git Commit Message
+
+Every phase must compile successfully before moving forward.
+
+Let's build this project like a real production application used by thousands of users.

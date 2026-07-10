@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "LinkSnap"
+version = "1.0.0"
+id = "artifacts/linksnap"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23046
+
+[services.development]
+run = "pnpm --filter @workspace/linksnap run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/linksnap", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/linksnap/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23046"
+BASE_PATH = "/"

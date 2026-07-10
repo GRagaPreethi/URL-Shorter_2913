@@ -10,6 +10,12 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: links
+    description: Link operations
+  - name: analytics
+    description: Analytics operations
+  - name: dashboard
+    description: Dashboard operations
 paths:
   /healthz:
     get:
@@ -24,6 +30,173 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary stats
+      responses:
+        "200":
+          description: Summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /links:
+    get:
+      operationId: listLinks
+      tags: [links]
+      summary: List links with search and pagination
+      parameters:
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 10 }
+      responses:
+        "200":
+          description: Paginated list of links
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LinkListResponse"
+    post:
+      operationId: createLink
+      tags: [links]
+      summary: Create a new short link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LinkInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Link"
+
+  /links/{id}:
+    get:
+      operationId: getLink
+      tags: [links]
+      summary: Get a link by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Link
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Link"
+    put:
+      operationId: updateLink
+      tags: [links]
+      summary: Update a link
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LinkUpdate"
+      responses:
+        "200":
+          description: Updated link
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Link"
+    delete:
+      operationId: deleteLink
+      tags: [links]
+      summary: Soft delete a link
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Deleted
+
+  /links/{id}/status:
+    patch:
+      operationId: updateLinkStatus
+      tags: [links]
+      summary: Enable or disable a link
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LinkStatusInput"
+      responses:
+        "200":
+          description: Updated link
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Link"
+
+  /links/suggest-alias:
+    post:
+      operationId: suggestAlias
+      tags: [links]
+      summary: Get AI-generated alias suggestions for a link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AliasSuggestionInput"
+      responses:
+        "200":
+          description: Suggested aliases
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AliasSuggestionResponse"
+
+  /analytics/{id}:
+    get:
+      operationId: getLinkAnalytics
+      tags: [analytics]
+      summary: Get analytics for a link
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Analytics summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsSummary"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +207,129 @@ components:
       required:
         - status
 
+    Link:
+      type: object
+      required:
+        [
+          id,
+          title,
+          originalUrl,
+          shortCode,
+          isActive,
+          expiresAt,
+          clickCount,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        originalUrl: { type: string }
+        shortCode: { type: string }
+        customAlias: { type: ["string", "null"] }
+        isActive: { type: boolean }
+        expiresAt: { type: ["string", "null"], format: date-time }
+        clickCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    LinkInput:
+      type: object
+      required: [title, originalUrl]
+      properties:
+        title: { type: string, minLength: 1 }
+        originalUrl: { type: string, minLength: 1 }
+        customAlias: { type: string }
+        expiresAt: { type: string, format: date-time }
+
+    LinkUpdate:
+      type: object
+      properties:
+        title: { type: string, minLength: 1 }
+        originalUrl: { type: string, minLength: 1 }
+        expiresAt: { type: ["string", "null"], format: date-time }
+
+    LinkStatusInput:
+      type: object
+      required: [isActive]
+      properties:
+        isActive: { type: boolean }
+
+    LinkListResponse:
+      type: object
+      required: [items, total, page, limit]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Link"
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+
+    DashboardSummary:
+      type: object
+      required: [totalLinks, totalClicks, activeLinks, expiredLinks]
+      properties:
+        totalLinks: { type: integer }
+        totalClicks: { type: integer }
+        activeLinks: { type: integer }
+        expiredLinks: { type: integer }
+
+    AliasSuggestionInput:
+      type: object
+      required: [title, originalUrl]
+      properties:
+        title: { type: string }
+        originalUrl: { type: string }
+
+    AliasSuggestionResponse:
+      type: object
+      required: [suggestions]
+      properties:
+        suggestions:
+          type: array
+          items: { type: string }
+
+    AnalyticsSummary:
+      type: object
+      required:
+        [
+          linkId,
+          totalClicks,
+          dailyClicks,
+          browsers,
+          devices,
+          countries,
+          referrers,
+        ]
+      properties:
+        linkId: { type: integer }
+        totalClicks: { type: integer }
+        dailyClicks:
+          type: array
+          items:
+            $ref: "#/components/schemas/NamedCount"
+        browsers:
+          type: array
+          items:
+            $ref: "#/components/schemas/NamedCount"
+        devices:
+          type: array
+          items:
+            $ref: "#/components/schemas/NamedCount"
+        countries:
+          type: array
+          items:
+            $ref: "#/components/schemas/NamedCount"
+        referrers:
+          type: array
+          items:
+            $ref: "#/components/schemas/NamedCount"
+
+    NamedCount:
+      type: object
+      required: [name, count]
+      properties:
+        name: { type: string }
+        count: { type: integer }

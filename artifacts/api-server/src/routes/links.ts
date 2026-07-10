@@ -19,7 +19,7 @@ import {
   SuggestAliasResponse,
 } from "@workspace/api-zod";
 import { generateBase62Code, isValidAlias } from "../lib/shortCode";
-import { fallbackAliasSuggestions } from "../lib/aliasSuggestion";
+import { suggestAliases } from "../lib/aliasSuggestion";
 import { isSafeRedirectUrl } from "../lib/url";
 
 const router: IRouter = Router();
@@ -128,7 +128,7 @@ router.post("/links/suggest-alias", async (req, res): Promise<void> => {
     return;
   }
   const { title, originalUrl } = parsed.data;
-  const suggestions = fallbackAliasSuggestions(title, originalUrl);
+  const suggestions = await suggestAliases(title, originalUrl);
   res.json(SuggestAliasResponse.parse({ suggestions }));
 });
 

@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "lu1LoNLF10ENQDtc4bjgL"
+uri = "file://downloads/linksnap-project.zip"
+type = "unspecified"
+title = "LinkSnap — Full Project Export"

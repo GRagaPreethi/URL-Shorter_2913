@@ -1,0 +1,62 @@
+# Docker Compose setup for running LinkSnap outside of Replit.
+#
+# This is NOT the primary development workflow for this project (see
+# docs/tradeoffs.md) — inside Replit, Postgres is already provisioned and
+# the app runs via `pnpm --filter ... run dev` workflows. This file exists
+# so the project can also be run standalone with a single command.
+#
+# Usage:
+#   cp .env.example .env        # then set GEMINI_API_KEY if you want real AI suggestions
+#   docker compose up --build
+#
+# The API server will be available at http://localhost:8080/api
+# The frontend will be available at http://localhost:5173
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: linksnap
+      POSTGRES_PASSWORD: linksnap
+      POSTGRES_DB: linksnap
+    ports:
+      - "5432:5432"
+    volumes:
+      - linksnap_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U linksnap"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api-server:
+    build:
+      context: .
+      dockerfile: artifacts/api-server/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://linksnap:linksnap@postgres:5432/linksnap
+      PORT: 8080
+      NODE_ENV: production
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: artifacts/linksnap/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - api-server
+    environment:
+      PORT: 5173
+    ports:
+      - "5173:5173"
+
+volumes:
+  linksnap_postgres_data:

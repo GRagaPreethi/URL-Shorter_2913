@@ -1,3 +1,0 @@
-- [Orval/Zod codegen `format: uri` bug](orval-zod-format-uri.md) — OpenAPI `format: uri` breaks `typecheck:libs` in this workspace's Orval+Zod setup; validate URLs in app code instead.
-- [Replit AI integration upgrade decline](replit-ai-integration-declined.md) — when a managed AI provider setup returns `awaiting_account_upgrade` and the user declines, fall back to `requestSecrets` for a user-supplied key; never retry `setupReplitAIIntegrations`.
-- Gemini via `@google/genai` with a user-supplied key: `gemini-2.5-flash` returned 404 "no longer available to new users" — use `gemini-flash-latest` (or check available models) instead of hardcoding a dated model name.
